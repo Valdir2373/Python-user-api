@@ -1,22 +1,48 @@
 from abc import ABC, abstractmethod
-from typing import Any, List
+from typing import Any, List, Optional, TypeVar, Generic, Dict, Sequence, Union
+
+T = TypeVar("T")
 
 class IDataAccess(ABC):
     @abstractmethod
-    async def testConnection(self, uri: str) -> bool:
+    async def find_many(
+        self, 
+        collection_name: str, 
+        query: Optional[Dict[str, Any]] = None, 
+        select_fields: Optional[Sequence[str]] = None
+    ) -> List[Dict[str, Any]]:
         pass
+
     @abstractmethod
-    async def dumpDatabase(self, uri: str, outputPath: str) -> None:
+    async def find_one(
+        self, 
+        collection_name: str, 
+        query: Dict[str, Any], 
+        select_fields: Optional[Sequence[str]] = None
+    ) -> Optional[Dict[str, Any]]:
         pass
+
     @abstractmethod
-    async def readTable(self, uri: str, tableName: str) -> List[Any]:
+    async def create(
+        self, 
+        collection_name: str, 
+        data: Dict[str, Any]
+    ) -> Union[str, int, None]:
         pass
+
     @abstractmethod
-    async def deleteRecord(self, uri: str, collection: str, filter: Any) -> bool:
+    async def update(
+        self, 
+        collection_name: str, 
+        query: Dict[str, Any], 
+        data: Dict[str, Any]
+    ) -> int:
         pass
+
     @abstractmethod
-    async def find(self, uri: str, collection: str, query: Any) -> List[Any]:
-        pass
-    @abstractmethod
-    async def insert(self, uri: str, collection: str, data: Any) -> Any:
+    async def remove(
+        self, 
+        collection_name: str, 
+        query: Dict[str, Any]
+    ) -> int:
         pass

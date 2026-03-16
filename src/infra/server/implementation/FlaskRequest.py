@@ -1,15 +1,19 @@
 from typing import Any, Dict, Optional
-from src.infra.server.interfaces.IRequest import IRequest
 
 
-class FlaskRequest(IRequest):
-    def __init__(self, flask_request):
-        self.flask_request = flask_request
-        self.body = flask_request.get_json(silent=True) or {}
-        self.params = dict(flask_request.args)
-        self.query = dict(flask_request.args)
-        self.headers = dict(flask_request.headers)
-        self.method = flask_request.method
-        self.path = flask_request.path
+class FlaskRequest:
+    def __init__(self, flask_req, route_params: Dict[str, Any] = None):
+        self.flask_request = flask_req
+        self.body = flask_req.get_json(silent=True) or {}
+        self.params = self._merge_params(dict(flask_req.args), route_params)
+        self.query = dict(flask_req.args)
+        self.headers = dict(flask_req.headers)
+        self.method = flask_req.method
+        self.path = flask_req.path
         self.userPayload = None
-        self.cookies = dict(flask_request.cookies)
+        self.cookies = dict(flask_req.cookies)
+
+    def _merge_params(self, query_params: Dict[str, Any], route_params: Dict[str, Any] = None) -> Dict[str, Any]:
+        if route_params is None:
+            return query_params
+        return {**query_params, **route_params}
